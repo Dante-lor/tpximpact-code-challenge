@@ -16,7 +16,7 @@ public class ShortenRequestValidationService {
     private final int maxAliasSize;
     private final ShortenedAddressDAO shortenedAddressDAO;
 
-    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("[a-z-\\d]+");
+    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("^[a-z0-9-]+$");
 
     public ShortenRequestValidationService(@Value("${alias.maxSize}") int maxAliasSize, 
         ShortenedAddressDAO shortenedAddressDAO) {
@@ -31,17 +31,15 @@ public class ShortenRequestValidationService {
         } else {
             if (shortenRequest.customAlias() != null) {
                 final String customAlias = shortenRequest.customAlias();
-
-                if (!ALLOWED_CHARACTERS.matcher(customAlias).matches()) {
-                    errors.add("alias must only contain lowercase letters and dashes");
+                
+                if (customAlias.isBlank()) {
+                    errors.add("aliases cannot be blank");
+                } else if (!ALLOWED_CHARACTERS.matcher(customAlias).matches()) {
+                    errors.add("alias must only contain lowercase letters, numbers and dashes");
                 }
 
                 if (customAlias.length() > maxAliasSize) {
                     errors.add("the max size for any alias is " + maxAliasSize + " characters");
-                }
-
-                if (customAlias.isBlank()) {
-                    errors.add("aliases cannot be blank");
                 }
 
                 // Only need to check for duplicates if custom alias is valid (and therefore could exist in DB)
@@ -55,7 +53,7 @@ public class ShortenRequestValidationService {
             } 
 
             // TODO continue adding validation (like checking it's not one of our other paths)
-
+            
 
         }
 
