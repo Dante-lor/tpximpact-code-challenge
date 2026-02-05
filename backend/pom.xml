@@ -32,6 +32,11 @@
 			<groupId>org.apache.commons</groupId>
     		<artifactId>commons-lang3</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.0.1</version>
+		</dependency>
 
 		<!-- Just to speed things up -->
 		<dependency>
@@ -52,7 +57,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<!-- <scope>test</scope> --> <!-- Temporary for testing -->
 		</dependency>
 	</dependencies>
 

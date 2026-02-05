@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ShortenResponse;
 import com.tpximpact.shortenerservice.model.ShortenedAddress;
@@ -26,7 +27,7 @@ public class ShortenedAddressService {
     public ShortenedAddressService(ShortenedAddressDAO shortenedAddressDAO, 
             ShortenRequestValidationService shortenRequestValidationService,
             HttpServletRequest currentRequest,
-            @Value("alias.maxSize") int maxAliasSize) {
+            @Value("${alias.maxSize}") int maxAliasSize) {
         this.shortenedAddressDAO = shortenedAddressDAO;
         this.requestValidation = shortenRequestValidationService;
         this.maxAliasSize = maxAliasSize;
@@ -53,7 +54,7 @@ public class ShortenedAddressService {
             String errorMessage = "Request failed validation with the following errors: " +
                     String.join(", ", result.errors());
 
-            throw new IllegalArgumentException(errorMessage);
+            throw new ValidationFailedException(errorMessage);
         }
     }
 

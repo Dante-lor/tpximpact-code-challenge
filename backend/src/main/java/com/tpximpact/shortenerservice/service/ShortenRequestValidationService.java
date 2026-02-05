@@ -18,7 +18,7 @@ public class ShortenRequestValidationService {
 
     private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("[a-z-\\d]+");
 
-    public ShortenRequestValidationService(@Value("alias.maxSize") int maxAliasSize, 
+    public ShortenRequestValidationService(@Value("${alias.maxSize}") int maxAliasSize, 
         ShortenedAddressDAO shortenedAddressDAO) {
         this.maxAliasSize = maxAliasSize;
         this.shortenedAddressDAO = shortenedAddressDAO;
