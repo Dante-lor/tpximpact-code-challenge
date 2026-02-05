@@ -10,6 +10,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,14 +38,14 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenRequestIsNull() {
+	void test_validate_returnsErrorWhenRequestIsNull() {
 		ValidationResult result = validationService.validate(null);
 		assertFalse(result.isValid());
 		assertTrue(result.errors().contains("request cannot be null"));
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenFullUrlMissing() {
+	void test_validate_returnsErrorWhenFullUrlMissing() {
 		ShortenRequest req = new ShortenRequest(null, null);
 		ValidationResult result = validationService.validate(req);
 		assertFalse(result.isValid());
@@ -51,7 +53,7 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenAliasHasInvalidCharacters() {
+	void test_validate_returnsErrorWhenAliasHasInvalidCharacters() {
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), "Bad!");
 		ValidationResult result = validationService.validate(req);
 		assertFalse(result.isValid());
@@ -59,7 +61,7 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenAliasTooLong() {
+	void test_validate_returnsErrorWhenAliasTooLong() {
 		// alias length 6 when maxAliasSize is 5
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), "abcdef");
 		ValidationResult result = validationService.validate(req);
@@ -69,7 +71,7 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorswhenAliasBlank() {
+	void test_validate_returnsErrorsWhenAliasBlank() {
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), "   ");
 		ValidationResult result = validationService.validate(req);
 		assertFalse(result.isValid());
@@ -79,7 +81,7 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenAliasAlreadyExists() {
+	void test_validate_returnsErrorWhenAliasAlreadyExists() {
 		String alias = "taken";
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), alias);
 		when(dao.findByAlias(alias)).thenReturn(Optional.of(
@@ -92,15 +94,25 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorwhenCustomAliasIsBlank() {
+	void test_validate_returnsErrorWhenCustomAliasIsBlank() {
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), "");
 		ValidationResult result = validationService.validate(req);
 		assertFalse(result.isValid());
 		assertTrue(result.errors().contains("aliases cannot be blank"));
 	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "error", "urls"})
+	void test_validate_returnsErrorWhenUsingReservedPath(String alias) {
+		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), alias);
+
+		ValidationResult result = validationService.validate(req);
+		assertFalse(result.isValid());
+		assertTrue(result.errors().contains("The alias " + alias + " is not permitted as it clashes with other paths"));
+	}
 	
 	@Test
-	void test_validate_isValidwhenNoCustomAliasProvided() {
+	void test_validate_isValidWhenNoCustomAliasProvided() {
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), null);
 		ValidationResult result = validationService.validate(req);
 		assertTrue(result.isValid());

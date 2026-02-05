@@ -26,7 +26,8 @@ public class ShortenedAddressService {
     private final ShortenRequestValidationService requestValidation;
     private final Integer maxAliasSize;
 
-    public ShortenedAddressService(ShortenedAddressDAO shortenedAddressDAO, 
+    public ShortenedAddressService(
+            ShortenedAddressDAO shortenedAddressDAO, 
             ShortenRequestValidationService shortenRequestValidationService,
             HttpServletRequest currentRequest,
             @Value("${alias.maxSize}") int maxAliasSize) {
@@ -61,7 +62,6 @@ public class ShortenedAddressService {
     }
 
     public Optional<URI> getForwardedURI(String alias) {
-
         return shortenedAddressDAO.findByAlias(alias)
             .map(ShortenedAddress::getOriginalUrl)
             .map(this::toURI);
@@ -100,12 +100,11 @@ public class ShortenedAddressService {
         boolean used = true;
         String generated = "";
 
-        while (!used) {
+        while (used) {
             generated = RandomStringUtils.secure()
                     .nextAlphanumeric(6, maxAliasSize);
 
             used = shortenedAddressDAO.findByAlias(generated).isPresent();
-            
         }
 
         return generated;
