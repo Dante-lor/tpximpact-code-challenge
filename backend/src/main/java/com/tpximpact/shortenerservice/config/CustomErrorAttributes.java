@@ -8,7 +8,7 @@ import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
-import com.tpximpact.shortenerservice.controller.NoSuchAliasException;
+import com.tpximpact.shortenerservice.exception.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 
 @Component

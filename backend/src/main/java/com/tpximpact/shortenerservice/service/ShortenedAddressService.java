@@ -8,7 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.tpximpact.shortenerservice.controller.NoSuchAliasException;
+import com.tpximpact.shortenerservice.exception.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ShortenResponse;
