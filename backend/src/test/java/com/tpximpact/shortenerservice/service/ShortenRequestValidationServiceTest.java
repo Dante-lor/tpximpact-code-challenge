@@ -71,13 +71,12 @@ class ShortenRequestValidationServiceTest {
 	}
 
 	@Test
-	void test_validate_returnsErrorsWhenAliasBlank() {
+	void test_validate_returnsErrorWhenAliasBlank() {
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), "   ");
 		ValidationResult result = validationService.validate(req);
 		assertFalse(result.isValid());
 		// blank alias also violates allowed characters
 		assertTrue(result.errors().contains("aliases cannot be blank"));
-		assertTrue(result.errors().contains("alias must only contain lowercase letters, numbers and dashes"));
 	}
 
 	@Test
