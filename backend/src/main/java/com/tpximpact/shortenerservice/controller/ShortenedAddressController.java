@@ -1,8 +1,11 @@
 package com.tpximpact.shortenerservice.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ShortenResponse;
+import com.tpximpact.shortenerservice.model.StoredAlias;
 import com.tpximpact.shortenerservice.service.ShortenedAddressService;
 
 @RestController
@@ -39,6 +43,20 @@ public class ShortenedAddressController {
             })
             .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{alias}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAlias(@PathVariable("alias") String alias) {
+        shortenedAddressService.deleteStoredAlias(alias);
+    }
+
+    @GetMapping(path = "/urls", 
+            produces = MediaType.APPLICATION_JSON_VALUE, 
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<StoredAlias> getStoredAliases() {
+        return shortenedAddressService.getStoredURLs();
+    }
+
 
 
 }

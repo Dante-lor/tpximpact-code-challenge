@@ -1,16 +1,19 @@
 package com.tpximpact.shortenerservice.service;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.tpximpact.shortenerservice.controller.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ShortenResponse;
 import com.tpximpact.shortenerservice.model.ShortenedAddress;
+import com.tpximpact.shortenerservice.model.StoredAlias;
 import com.tpximpact.shortenerservice.model.ValidationResult;
 import com.tpximpact.shortenerservice.repository.ShortenedAddressDAO;
 
@@ -62,6 +65,26 @@ public class ShortenedAddressService {
         return shortenedAddressDAO.findByAlias(alias)
             .map(ShortenedAddress::getOriginalUrl)
             .map(this::toURI);
+    }
+
+    public void deleteStoredAlias(String alias) {
+        final ShortenedAddress address = shortenedAddressDAO.findByAlias(alias)
+            .orElseThrow(() -> new NoSuchAliasException("The alias " + alias + " does not exist"));
+
+        shortenedAddressDAO.deleteById(address.getId());
+    }
+
+    public List<StoredAlias> getStoredURLs() {
+        return shortenedAddressDAO.findAll().stream()
+            .map(this::convertToStoredAlias)
+            .toList();
+    }
+
+    private StoredAlias convertToStoredAlias(ShortenedAddress shortenedAddress) {
+        return new StoredAlias(
+                shortenedAddress.getAlias(), 
+                toURI(shortenedAddress.getOriginalUrl()), 
+                toAbsoluteURL(shortenedAddress.getAlias()));
     }
 
     private URI toAbsoluteURL(String alias) {

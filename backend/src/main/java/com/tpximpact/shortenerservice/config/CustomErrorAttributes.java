@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
+import com.tpximpact.shortenerservice.controller.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 
 @Component
@@ -23,6 +24,7 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
 
         ErrorAttributeOptions finalOptions = switch (error) {
             case ValidationFailedException e -> options.including(Include.MESSAGE);
+            case NoSuchAliasException e -> options.including(Include.MESSAGE);
             default -> options;
         };
 
