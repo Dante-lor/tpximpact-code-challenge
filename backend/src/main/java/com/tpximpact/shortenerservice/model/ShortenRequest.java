@@ -1,7 +1,7 @@
 package com.tpximpact.shortenerservice.model;
 
-import java.net.URL;
+import java.net.URI;
 
-public record ShortenRequest(URL fullUrl, String customAlias) {
+public record ShortenRequest(URI fullUrl, String customAlias) {
     
 }

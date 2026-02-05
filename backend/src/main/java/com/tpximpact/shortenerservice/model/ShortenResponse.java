@@ -1,7 +1,7 @@
 package com.tpximpact.shortenerservice.model;
 
-import java.net.URL;
+import java.net.URI;
 
-public record ShortenResponse(URL shortUrl) {
+public record ShortenResponse(URI shortUrl) {
     
 }

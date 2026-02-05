@@ -1,8 +1,7 @@
 package com.tpximpact.shortenerservice.service;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,12 +57,19 @@ public class ShortenedAddressService {
         }
     }
 
-    private URL toAbsoluteURL(String alias) {
-        try {
-            return URI.create(String.format("http://localhost:8080/%s", alias)).toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } 
+    public Optional<URI> getForwardedURI(String alias) {
+
+        return shortenedAddressDAO.findByAlias(alias)
+            .map(ShortenedAddress::getOriginalUrl)
+            .map(this::toURI);
+    }
+
+    private URI toAbsoluteURL(String alias) {
+       return toURI(String.format("http://localhost:8080/%s", alias));
+    }
+
+    private URI toURI(String url) {
+        return URI.create(url);
     }
 
     private String generateNewAlias() {
