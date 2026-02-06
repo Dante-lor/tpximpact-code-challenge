@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tpx URL Shortener",
-  description: "Shorten URLs for Free using our API",
+  title: "TPX URL Shortener",
+  description: "Shorten URLs using our API",
 };
 
 export default function RootLayout({
