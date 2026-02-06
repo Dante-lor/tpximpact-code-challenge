@@ -6,8 +6,10 @@
 	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
-			"installMaven": true
+			"installMaven": true,
+			"javaVersion": "21"
 		},
+		"ghcr.io/devcontainers/features/docker-in-docker": {},
 		"ghcr.io/devcontainers/features/node": {}
 	},
 

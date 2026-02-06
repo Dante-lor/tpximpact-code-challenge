@@ -57,10 +57,9 @@ public class ShortenRequestValidationService {
 
             if (shortenRequest.fullUrl() == null) {
                 errors.add("full url must be provided");
-            } 
-
-            // TODO continue adding validation (like checking it's not one of our other paths)
+            }
             
+            // TODO check that the current URL is not used.
 
         }
 
