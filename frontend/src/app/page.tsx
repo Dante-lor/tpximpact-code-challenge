@@ -119,7 +119,9 @@ export default function Home() {
                 </TableCell>
               </TableRow>
             ) : (
-            urls.map((url) => (
+            urls
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((url) => (
               <TableRow
                 key={url.alias}
               >
