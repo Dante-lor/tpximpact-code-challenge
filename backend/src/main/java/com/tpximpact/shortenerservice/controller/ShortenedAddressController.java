@@ -18,7 +18,10 @@ import com.tpximpact.shortenerservice.model.ShortenResponse;
 import com.tpximpact.shortenerservice.model.StoredAlias;
 import com.tpximpact.shortenerservice.service.ShortenedAddressService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 public class ShortenedAddressController {
 
     private final ShortenedAddressService shortenedAddressService;
@@ -31,9 +34,15 @@ public class ShortenedAddressController {
     public ShortenResponse shortenUrl(@RequestBody ShortenRequest shortenRequest) {
         return shortenedAddressService.shorten(shortenRequest);
     }
-
+    
+    @GetMapping(path = "/urls", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StoredAlias> getStoredAliases() {
+        log.info("Entered the correct place");
+        return shortenedAddressService.getStoredURLs();
+    }
+    
     @ResponseStatus(HttpStatus.FOUND)
-    @GetMapping("/{alias}")
+    @GetMapping("/{alias:^(?!urls$)[a-zA-Z0-9_-]+$}")
     public ResponseEntity<Object> forwardToURL(@PathVariable("alias") String alias) {
         return shortenedAddressService.getForwardedURI(alias)
             .map(url -> {
@@ -50,12 +59,6 @@ public class ShortenedAddressController {
         shortenedAddressService.deleteStoredAlias(alias);
     }
 
-    @GetMapping(path = "/urls", 
-            produces = MediaType.APPLICATION_JSON_VALUE, 
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<StoredAlias> getStoredAliases() {
-        return shortenedAddressService.getStoredURLs();
-    }
 
 
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { ContentCopy, Delete, OpenInNew } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import Image from "next/image";
+import { Box, Button, Checkbox, Divider, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+
 import { useEffect, useState } from "react";
 
 type ShortenedURL = {
@@ -15,21 +15,68 @@ type ShortenedURL = {
 export default function Home() {
 
   const [urls, setUrls] = useState<ShortenedURL[]>([]);
+  const [url, setUrl] = useState("");
+  const [alias, setAlias] = useState("");
 
-  useEffect(() => {
+  const fetchUrls = () => {
     fetch("http://localhost:8080/urls")
       .then(res => res.json())
-      .then(data => setUrls(data))
-  });
+      .then(setUrls);
+  }
+
+  useEffect(() => {
+    fetchUrls();
+  }, []);
+
+
+  const copyShortUrl = async (url: string) => {
+    await navigator.clipboard.writeText(url);
+    
+  }
+
+  const deleteAlias = async (alias: string) => {
+    const encoded = encodeURIComponent(alias);
+    const resp = await fetch(`http://localhost:8080/${encoded}`, {
+      method: 'DELETE'
+    });
+
+    if (resp.ok) {
+      fetchUrls();
+    }
+  }
+
+
+  const shortenURL = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    const body = {
+      fullUrl: url,
+      customAlias: alias.length === 0 ? undefined : alias
+    }
+
+    const resp = await fetch('http://localhost:8080/shorten', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (resp.ok) {
+      setUrl("")
+      setAlias("")
+      fetchUrls();
+    }
+  }
 
 
   return (
     <Grid padding={2}>
       <Typography variant="h6" component="div" marginBottom={2}>Shorten a new URL</Typography>
-      <Box component="form" marginBottom={2}>
+      <Box onSubmit={shortenURL} component="form" marginBottom={2}>
         <Stack spacing={2} maxWidth={300}>
-          <TextField label="URL to shorten" required></TextField>
-          <TextField label="alias" helperText="Leave blank for a random alias" ></TextField>
+          <TextField label="URL to shorten" value={url} onChange={(e) => setUrl(e.target.value)} required></TextField>
+          <TextField label="alias" value={alias} onChange={(e) => setAlias(e.target.value)} helperText="Leave blank for a random alias" ></TextField>
           <div>
             <Button type="submit" variant="contained">Shorten</Button>
           </div>
@@ -39,14 +86,9 @@ export default function Home() {
       <Typography variant="h6" padding={1}> Shortened URLs</Typography>
       {/* Create table showing the Shortened URLs */}
       <TableContainer component={Paper}>
-        <Table>
+        <Table sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  color="primary"
-                />
-              </TableCell>
               <TableCell>Full URL</TableCell>
               <TableCell>Shortened URL</TableCell>
               <TableCell align="right"></TableCell>
@@ -64,18 +106,54 @@ export default function Home() {
               <TableRow
                 key={url.alias}
               >
-                <TableCell>{url.fullUrl}</TableCell>
-                <TableCell>{url.shortUrl}</TableCell>
+                <TableCell >
+                  <Tooltip title={url.fullUrl}>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {url.fullUrl}
+                    </Box>
+                  </Tooltip>
+                </TableCell>
                 <TableCell>
-                  <IconButton>
-                    <ContentCopy />
-                  </IconButton>
-                  <IconButton>
-                    <OpenInNew />
-                  </IconButton>
-                  <IconButton>
-                    <Delete />
-                  </IconButton>
+                  <Tooltip title={url.shortUrl}>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {url.shortUrl}
+                    </Box>
+                  </Tooltip>
+                </TableCell>
+                <TableCell align="right">
+                  <Tooltip title="Copy short URL">
+                    <IconButton  onClick={() => copyShortUrl(url.shortUrl)}>
+                      <ContentCopy />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Open in new tab">
+                    <IconButton onClick={() => window.open(url.shortUrl, "_blank", "noopener,noreferrer")}>
+                      <OpenInNew />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Remove alias">
+                    <IconButton onClick={() => deleteAlias(url.alias)} >
+                      <Delete />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
 
               </TableRow>
