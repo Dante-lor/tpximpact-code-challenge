@@ -1,7 +1,7 @@
 'use client';
 
 import { ContentCopy, Delete, OpenInNew } from "@mui/icons-material";
-import { Box, Button, Checkbox, Divider, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TablePaginationActions, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 
 import { useEffect, useState } from "react";
 
@@ -17,6 +17,9 @@ export default function Home() {
   const [urls, setUrls] = useState<ShortenedURL[]>([]);
   const [url, setUrl] = useState("");
   const [alias, setAlias] = useState("");
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
 
   const fetchUrls = () => {
     fetch("http://localhost:8080/urls")
@@ -44,6 +47,20 @@ export default function Home() {
       fetchUrls();
     }
   }
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
 
   const shortenURL = async (e: React.SubmitEvent) => {
@@ -159,7 +176,20 @@ export default function Home() {
               </TableRow>
             )))}
           </TableBody>
+          <TableFooter >
+            <TableRow>
+              <TablePagination 
+                colSpan={3}
+                count={urls.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
 
+          </TableFooter>
         </Table>
       </TableContainer>
 
