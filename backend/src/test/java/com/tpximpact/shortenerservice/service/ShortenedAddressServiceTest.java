@@ -21,14 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.tpximpact.shortenerservice.exception.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
-import com.tpximpact.shortenerservice.model.ShortenedAddress;
 import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ShortenResponse;
+import com.tpximpact.shortenerservice.model.ShortenedAddress;
 import com.tpximpact.shortenerservice.model.StoredAlias;
 import com.tpximpact.shortenerservice.model.ValidationResult;
 import com.tpximpact.shortenerservice.repository.ShortenedAddressDAO;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ShortenedAddressServiceTest {
@@ -40,7 +38,7 @@ class ShortenedAddressServiceTest {
     private ShortenRequestValidationService validationService;
 
     @Mock
-    private HttpServletRequest httpServletRequest;
+    private CurrentURLService currentURLService;
 
     private ShortenedAddressService service;
 
@@ -48,7 +46,7 @@ class ShortenedAddressServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new ShortenedAddressService(dao, validationService, httpServletRequest, maxAliasSize);
+        service = new ShortenedAddressService(dao, validationService, currentURLService, maxAliasSize);
     }
 
     @Test
@@ -63,6 +61,9 @@ class ShortenedAddressServiceTest {
                 .build();
 
         when(dao.save(any(ShortenedAddress.class))).thenReturn(saved);
+
+        when(currentURLService.getRequestedURLWithNoPath()).thenReturn("http://localhost:8080");
+
 
         ShortenResponse resp = service.shorten(req);
 
@@ -89,6 +90,9 @@ class ShortenedAddressServiceTest {
                 .build();
 
         when(dao.save(any(ShortenedAddress.class))).thenReturn(returned);
+
+        when(currentURLService.getRequestedURLWithNoPath()).thenReturn("http://localhost:8080");
+
 
         ShortenResponse resp = service.shorten(req);
 
@@ -144,8 +148,10 @@ class ShortenedAddressServiceTest {
         ShortenedAddress b = ShortenedAddress.builder().id(8L).alias("b2").originalUrl("http://two").build();
 
         when(dao.findAll()).thenReturn(List.of(a, b));
+        when(currentURLService.getRequestedURLWithNoPath()).thenReturn("http://localhost:8080");
 
         List<StoredAlias> list = service.getStoredURLs();
+
 
         assertEquals(2, list.size());
         assertEquals("a1", list.get(0).alias());

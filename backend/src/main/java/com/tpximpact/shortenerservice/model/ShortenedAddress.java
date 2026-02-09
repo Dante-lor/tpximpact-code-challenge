@@ -7,14 +7,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
+/**
+ * JPA entity used to store the shortened addresses. Includes important details like uniqueness
+ * and indices for fast lookup.
+ */
 @Entity
 @Table(
     indexes = {
@@ -22,13 +21,8 @@ import lombok.ToString;
          @Index(columnList = "original_url")
     }
 )
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
 @Builder
+@Data
 public class ShortenedAddress {
 
     @Id
@@ -40,5 +34,5 @@ public class ShortenedAddress {
 
     @Column(name = "original_url", unique = false, nullable = false)
     private String originalUrl;
-    
+
 }

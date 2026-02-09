@@ -2,8 +2,8 @@ spring:
   application:
     name: shortener-service
 
-  datasource:
-    url: jdbc:h2:mem:example
+  # datasource:
+    # url: jdbc:h2:mem:example
 
 alias:
   maxSize: 20

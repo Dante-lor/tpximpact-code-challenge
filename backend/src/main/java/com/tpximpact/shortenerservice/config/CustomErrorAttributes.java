@@ -11,16 +11,29 @@ import org.springframework.web.context.request.WebRequest;
 import com.tpximpact.shortenerservice.exception.NoSuchAliasException;
 import com.tpximpact.shortenerservice.exception.ValidationFailedException;
 
+/**
+ * Override of the DefaultErrorAttributes. This hooks in to springs default error
+ * handling and ensures that any expected client side errors have their error
+ * messages returned.
+ */
 @Component
 public class CustomErrorAttributes extends DefaultErrorAttributes {
 
+    /**
+     * Overrides the default error attributes. This ensures an error message is sent back to the
+     * user if validation fails or they provide an alias that doesn't exist. This will take priority
+     * over the settings set in configuration.
+     * 
+     * @param webRequest the web request
+     * @param the default configured options.
+     */
     @Override
     public Map<String, Object> getErrorAttributes(
             WebRequest webRequest,
             ErrorAttributeOptions options) {
 
         
-        Throwable error = getError(webRequest);
+        final Throwable error = getError(webRequest);
 
         ErrorAttributeOptions finalOptions = switch (error) {
             case ValidationFailedException e -> options.including(Include.MESSAGE);

@@ -120,7 +120,7 @@ class ShortenRequestValidationServiceTest {
 
 	@Test
 	void test_validate_isValidwhenCustomAliasValidAndUnique() {
-		String alias = "ok-4";
+		String alias = "o_K-4";
 		ShortenRequest req = new ShortenRequest(URI.create("http://example.com"), alias);
 		when(dao.findByAlias(alias)).thenReturn(Optional.empty());
 

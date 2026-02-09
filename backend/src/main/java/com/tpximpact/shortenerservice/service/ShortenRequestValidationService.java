@@ -11,13 +11,18 @@ import com.tpximpact.shortenerservice.model.ShortenRequest;
 import com.tpximpact.shortenerservice.model.ValidationResult;
 import com.tpximpact.shortenerservice.repository.ShortenedAddressDAO;
 
+/**
+ * Validation service responsible for validating {@link ShortenRequest} objects. This ensures
+ * that the alias is compliant if provided by the user. It also ensures that certain keywords like
+ * "url" are not used as this would not work.
+ */
 @Service
 public class ShortenRequestValidationService {
 
     private final int maxAliasSize;
     private final ShortenedAddressDAO shortenedAddressDAO;
 
-    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("^[a-z0-9-]+$");
+    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("^[a-zA-Z0-9-_]+$");
 
     private static final Set<String> NOT_ALLOWED_PATHS = Set.of("urls", "error"); // It's a path used by the REST API
 
@@ -27,6 +32,13 @@ public class ShortenRequestValidationService {
         this.shortenedAddressDAO = shortenedAddressDAO;
     }
 
+    /**
+     * Validates a request to ensure the alias and URL is compliant. The URL has to exist. It already has to
+     * be a valid URL for the request to make it this far.
+     *
+     * @param shortenRequest shorten request
+     * @return the validation result.
+     */
     public ValidationResult validate(final ShortenRequest shortenRequest) {
         final List<String> errors = new ArrayList<>();
         if (shortenRequest == null) {
@@ -58,9 +70,6 @@ public class ShortenRequestValidationService {
             if (shortenRequest.fullUrl() == null) {
                 errors.add("full url must be provided");
             }
-            
-            // TODO check that the current URL is not used.
-
         }
 
         return new ValidationResult(errors);
