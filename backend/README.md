@@ -33,7 +33,16 @@ This is the backend of the TPX URL Shortener project, built with Java and Spring
    mvn spring-boot:run
    ```
 
-4. The backend API will be available at [http://localhost:8080](http://localhost:8080/swagger-ui/index.html).
+4. The backend API (with swagger UI) will be available at [http://localhost:8080](http://localhost:8080/swagger-ui/index.html).
+
+## Features
+
+This API implements the openapi document described [here](../openapi.yaml). It includes the following features:
+
+✅ Storage and retrieval of aliased URLs using JPA.
+✅ Input validation - see [this class](./src/main/java/com/tpximpact/shortenerservice/service/ShortenRequestValidationService.java) for details
+✅ Alias generation.
+✅ Automatic Redirection.
 
 ## Running Tests
 

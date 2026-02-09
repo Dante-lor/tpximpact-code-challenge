@@ -5,6 +5,8 @@ Welcome to the TPX URL Shortener project! This application provides a simple and
 - **Frontend**: A Next.js application for the user interface.
 - **Backend**: A Java-based service for handling URL shortening logic and data storage.
 
+![application screenshot](./static/screenshot.png)
+
 ## Project Layout
 
 ```
@@ -21,7 +23,7 @@ Welcome to the TPX URL Shortener project! This application provides a simple and
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- Node.js 24+ and npm (for frontend development)
+- Node.js v24+ and npm (for frontend development)
 - Java 21+ and Maven (for backend development)
 
 > [!TIP]
@@ -44,7 +46,7 @@ Welcome to the TPX URL Shortener project! This application provides a simple and
    - Frontend: [http://localhost:3000](http://localhost:3000)
    - Backend API: [http://localhost:8080](http://localhost:8080/swagger-ui/index.html)
 
-## Running Tests
+## Digging Deeper
 
 Refer to the individual README files for how each one works:
 
