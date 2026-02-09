@@ -5,7 +5,7 @@ import { Alert, Box, Button, Divider, Grid, IconButton, Paper, Snackbar, Stack, 
 
 import { useEffect, useState } from "react";
 
-type ShortenedURL = {
+export type ShortenedURL = {
   alias: string;
   fullUrl: string
   shortUrl: string
@@ -21,7 +21,6 @@ export default function Home() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [urlTouched, setUrlTouched] = useState(false);
-  const [aliasTouched, setAliasTouched] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState<string | null>(null);
 
@@ -35,7 +34,11 @@ export default function Home() {
   const fetchUrls = () => {
     fetch("http://localhost:8080/urls")
       .then(res => res.json())
-      .then(setUrls);
+      .then(setUrls)
+      .catch(() => {
+        setErrorMessage("Failed to load URLs");
+        setErrorMessageOpen(true);
+      });
   }
 
   useEffect(() => {
@@ -52,7 +55,7 @@ export default function Home() {
       new URL(value);
       setUrlError(null);
     } catch {
-      setUrlError("Please enter a valid url");
+      setUrlError("Please enter a valid URL");
     }
   }
 
@@ -62,11 +65,6 @@ export default function Home() {
     if (urlTouched) {
       checkUrlValidation(value);
     }
-  }
-
-  const onAliasBlur = () => {
-    setAliasTouched(true);
-    checkAliasValidation(alias);
   }
 
   const isReadyForSubmit = () => {
@@ -83,7 +81,7 @@ export default function Home() {
 
     // URL is valid
     
-    if (!alias || (aliasTouched && aliasError === null)) {
+    if (!alias || aliasError === null) {
       return true;
     }
 
@@ -110,9 +108,7 @@ export default function Home() {
   const onAliasChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setAlias(value);
-    if (aliasTouched) {
-      checkAliasValidation(value);
-    }
+    checkAliasValidation(value);
   }
 
   const copyShortUrl = async (url: string) => {
@@ -165,8 +161,7 @@ export default function Home() {
     if (resp.ok) {
       setUrl("")
       setAlias("")
-      setUrlTouched(false)
-      setAliasTouched(false);
+      setUrlTouched(false);
       setUrlError(null);
       setAliasError(null);
       fetchUrls();
@@ -201,7 +196,6 @@ export default function Home() {
             label="alias" 
             value={alias} 
             onChange={onAliasChange}
-            onBlur={onAliasBlur}
             error={!!aliasError} 
             helperText={aliasError || "Leave blank for a random alias"}
             ></TextField>
