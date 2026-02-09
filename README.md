@@ -33,7 +33,7 @@ Welcome to the TPX URL Shortener project! This application provides a simple and
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Dante-lor/tpximpact-code-challenge.git
    cd tpximpact-code-challenge
    ```
 
