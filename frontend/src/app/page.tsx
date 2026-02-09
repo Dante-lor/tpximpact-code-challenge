@@ -118,7 +118,6 @@ export default function Home() {
   const copyShortUrl = async (url: string) => {
     await navigator.clipboard.writeText(url);
     setShowCopiedMessage(true);
-    
   }
 
   const deleteAlias = async (alias: string) => {
