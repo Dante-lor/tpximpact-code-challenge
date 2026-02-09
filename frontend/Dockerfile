@@ -1,4 +1,4 @@
-FROM node:18-alpine AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 # Build Next.js
 RUN npm run build
 
-FROM gcr.io/distroless/nodejs18-debian12 AS runner
+FROM gcr.io/distroless/nodejs24-debian12 AS runner
 
 WORKDIR /app
 

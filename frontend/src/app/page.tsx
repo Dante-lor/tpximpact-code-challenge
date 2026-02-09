@@ -5,32 +5,45 @@ import { Alert, Box, Button, Divider, Grid, IconButton, Paper, Snackbar, Stack, 
 
 import { useEffect, useState } from "react";
 
+/**
+ * Shortened URL is what the server returns. Aliases are unique but full URLs are not.
+ */
 export type ShortenedURL = {
   alias: string;
   fullUrl: string
   shortUrl: string
 }
 
-
+/**
+ * Displays the home page.
+ *
+ * @returns the Home page
+ */
 export default function Home() {
 
+  // State of the table
   const [urls, setUrls] = useState<ShortenedURL[]>([]);
-  const [url, setUrl] = useState("");
-  const [alias, setAlias] = useState("");
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // State for the Form
+  const [url, setUrl] = useState("");
+  const [alias, setAlias] = useState("");
   const [urlTouched, setUrlTouched] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState<string | null>(null);
 
+  // Messages shown to the user
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorMessageOpen, setErrorMessageOpen] = useState(false);
-
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
 
+  // For alias validation
   const ALIAS_REGEX = /^[a-zA-Z0-9_-]+$/;
 
+  /**
+   * Fetch URLs from the server.
+   */
   const fetchUrls = () => {
     fetch("http://localhost:8080/urls")
       .then(res => res.json())
@@ -41,15 +54,27 @@ export default function Home() {
       });
   }
 
+  /**
+   * Load the table on startup
+   */
   useEffect(() => {
     fetchUrls();
   }, []);
 
+  /**
+   * Performs validation and sets the state to touch. This is done so that the form
+   * doesn't immediately start validating the URL when they start to enter it.
+   */
   const onUrlBlur = () => {
     setUrlTouched(true)
     checkUrlValidation(url);
   }
 
+  /**
+   * Check the URL is a genuine URL.
+   *
+   * @param value URL
+   */
   const checkUrlValidation = (value: string) => {
     try {
       new URL(value);
@@ -59,6 +84,12 @@ export default function Home() {
     }
   }
 
+  /**
+   * Action to perform when the URL is changed. This will update the state but also will
+   * perform validation once the user has finished setting the URL.
+   *
+   * @param event change event from the text input
+   */
   const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setUrl(value);
@@ -67,6 +98,11 @@ export default function Home() {
     }
   }
 
+  /**
+   * Checks if the form is ready for submission. This is used to enable / disable the button.
+   *
+   * @returns true if the form is ready for submission
+   */
   const isReadyForSubmit = () => {
     // No URL means we can't submit
     if (!url) {
@@ -88,6 +124,12 @@ export default function Home() {
     return false;
   }
 
+  /**
+   * Performs validation on the alias. The main checks are to ensure that only alphanumerics, hyphens
+   * or underscores are used and that the alias hasn't been used before.
+   *
+   * @param value the alias
+   */
   const checkAliasValidation = (value: string) => {
     if (!!value) {
       // Check conforms to agreed regex
@@ -105,17 +147,32 @@ export default function Home() {
     setAliasError(null);
   }
 
+  /**
+   * Updates the alias and immediately performs validation.
+   *
+   * @param event change event from the alias input
+   */
   const onAliasChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setAlias(value);
     checkAliasValidation(value);
   }
 
+  /**
+   * Copies the short URL to the clipboard and displays a confirmation message.
+   *
+   * @param url short URL to copy
+   */
   const copyShortUrl = async (url: string) => {
     await navigator.clipboard.writeText(url);
     setShowCopiedMessage(true);
   }
 
+  /**
+   * Deletes the alias by making a HTTP call to the server.
+   *
+   * @param alias the alias to delete
+   */
   const deleteAlias = async (alias: string) => {
     const encoded = encodeURIComponent(alias);
     const resp = await fetch(`http://localhost:8080/${encoded}`, {
@@ -127,6 +184,11 @@ export default function Home() {
     }
   }
 
+  /**
+   * Sets the page number when the table is paginated.
+   * @param _ buttonevent - unused
+   * @param newPage the new page number.
+   */
   const handleChangePage = (
     _: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
@@ -134,6 +196,11 @@ export default function Home() {
     setPage(newPage);
   };
 
+  /**
+   * Updates the rows per page on the table.
+   *
+   * @param event the new rows per page
+   */
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -141,7 +208,17 @@ export default function Home() {
     setPage(0);
   };
 
-
+  /**
+   * Shortens the URL by submitting the form to the server. If successful, the form
+   * will be cleared and the table refreshed. 
+   * 
+   * If the request fails, and the error is  a client error, the message is sent to the user. 
+   * If the message does not exist on the response, a default message is used. If the error is 
+   * any other type of errorthe error will be logged to the console for debugging and a 
+   * standard messageis shown to the user.
+   *
+   * @param e the submit event
+   */
   const shortenURL = async (e: React.SubmitEvent) => {
     e.preventDefault();
 

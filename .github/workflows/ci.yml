@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: CI / CD
 
 on:
   push:
@@ -15,8 +15,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,3 +30,23 @@ jobs:
     - name: Build with Maven
       working-directory: backend
       run: mvn package
+  
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # Could add more node versions to this
+        node-version: [24.x]  
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build
+    - run: npm run lint
+    - run: npm test

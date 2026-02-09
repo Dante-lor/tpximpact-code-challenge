@@ -33,5 +33,12 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
+  frontend:
+    build: ./frontend
+    container_name: shortener-ui
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 volumes:
   postgres_data:
